@@ -50,7 +50,7 @@ def test_mod(model, data_loader):
     return test_loss.item()/len(data_loader)
 
 
-def train_ens(n_models, n_units, n_layers, rain_loader, val_loader, train_loader_ens, val_loader_ens,
+def train_ens(n_models, n_units, n_layers, train_loader, val_loader, train_loader_ens, val_loader_ens,
               epochs=500):
     model_ls = nn.ModuleList()
     for i in range(n_models):
@@ -89,8 +89,12 @@ def main(n_models, n_data, n_epochs, n_layers, n_units, batch_size):
     train_loader_ens = data.DataLoader(training_ens_dataset, batch_size=batch_size, shuffle=True)
     val_loader_ens = data.DataLoader(val_ens_dataset, batch_size=batch_size)
 
-    val_loss, _ = train_ens(n_models, train_loader, val_loader,
+    val_loss = []
+
+    for i in range(1, 4):
+        val_loss_s, _ = train_ens(n_models, n_units*2**i, n_layers, train_loader, val_loader,
                             train_loader_ens, val_loader_ens, n_epochs)
+        val_loss.append(val_loss_s)
 
     print(val_loss)
     return val_loss
@@ -98,14 +102,12 @@ def main(n_models, n_data, n_epochs, n_layers, n_units, batch_size):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Ensemble training")
     parser.add_argument("--n-models", type=int, default=10)
-    parser.add_argument("--n-data", type=int, default=1000)
+    parser.add_argument("--n-data", type=int, default=10000)
     parser.add_argument("--n-epochs", type=int, default=500)
     parser.add_argument("--batch-size", type=int, default=100)
-    parser.add_argument("--n-units", type=int, default=512)
+    parser.add_argument("--n-units", type=int, default=128)
     parser.add_argument("--n-layers", type=int, default=8)
 
     args = parser.parse_args()
     kwargs = vars(args)
-    for i in range(5):
-        print("here")
-        main(2, 100, 20, 3+i, 512, 10)
+    main(**kwargs)
