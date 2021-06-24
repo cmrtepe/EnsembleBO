@@ -53,6 +53,10 @@ def test_mod(model, data_loader):
 def train_ens(n_models, n_units, n_layers, train_loader, val_loader, train_loader_ens, val_loader_ens,
               epochs=500):
     model_ls = nn.ModuleList()
+    if device=="cuda":
+        print("using cuda")
+    else:
+        print("using cpu")
     for i in range(n_models):
         net = SRM(n_layers, n_units).to(device)
         optimizer = torch.optim.Adam(net.parameters(), 
@@ -74,6 +78,9 @@ def main(n_models, n_data, n_epochs, n_layers, n_units, batch_size):
     # for pretraining models
     train_data_in, train_data_trg, val_data_in, val_data_trg = get_data(n_data)
 
+    train_data_in, train_data_trg = train_data_in.to(device), train_data_trg.to(device)
+    val_data_in, val_data_trg = val_data_in.to(device), val_data_trg.to(device) 
+
     training_dataset = ScatteringDataset(train_data_in, train_data_trg)
     val_dataset = ScatteringDataset(val_data_in, val_data_trg)
 
@@ -82,6 +89,9 @@ def main(n_models, n_data, n_epochs, n_layers, n_units, batch_size):
 
     # for training the ensemble
     train_in_ens, train_trg_ens, val_in_ens, val_trg_ens = get_data(n_data)
+
+    train_in_ens, train_trg_ens = train_in_ens.to(device), train_trg_ens.to(device)
+    val_in_ens, val_trg_ens = val_in_ens.to(device), val_trg_ens.to(device)
 
     training_ens_dataset = ScatteringDataset(train_in_ens, train_trg_ens)
     val_ens_dataset = ScatteringDataset(val_in_ens, val_trg_ens)
