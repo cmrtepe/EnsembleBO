@@ -112,7 +112,7 @@ def main(n_models, n_data, n_epochs, n_layers, n_units, batch_size):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Ensemble training")
     parser.add_argument("--n-models", type=int, default=10)
-    parser.add_argument("--n-data", type=int, default=10000)
+    parser.add_argument("--n-data", type=int, default=100)
     parser.add_argument("--n-epochs", type=int, default=500)
     parser.add_argument("--batch-size", type=int, default=100)
     parser.add_argument("--n-units", type=int, default=128)
