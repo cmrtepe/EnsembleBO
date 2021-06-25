@@ -114,9 +114,9 @@ if __name__ == "__main__":
     parser.add_argument("--n-models", type=int, default=10)
     parser.add_argument("--n-data", type=int, default=10000)
     parser.add_argument("--n-epochs", type=int, default=500)
-    parser.add_argument("--batch-size", type=int, default=100)
-    parser.add_argument("--n-units", type=int, default=128)
     parser.add_argument("--n-layers", type=int, default=8)
+    parser.add_argument("--n-units", type=int, default=128)
+    parser.add_argument("--batch-size", type=int, default=100)
 
     args = parser.parse_args()
     kwargs = vars(args)

@@ -6,7 +6,7 @@ from joblib import Parallel, delayed
 
 class MieScattering:
     def __init__(self, n_layers=4, lam_min=350, lam_max=750, n_lam=201, th_min=30, th_max=70, n_mat=4, sample_mat=False,
-                 n_cores=1):
+                 n_cores=6):
         self.n_layers = n_layers
         self.lam_min = lam_min
         self.lam_max = lam_max
@@ -55,10 +55,10 @@ class MieScattering:
         # return th,spect
 
         # # Version using joblib
-        # spect = Parallel(n_jobs=self.n_cores, verbose=1)(delayed(calc_spectrum)(i, self) for i in th)
-        # return th, np.squeeze(np.array(spect)[:, 0, :])
+        spect = Parallel(n_jobs=self.n_cores, verbose=1)(delayed(calc_spectrum)(i, self) for i in th)
+        return th, np.squeeze(np.array(spect)[:, 0, :])
 
-        return th, self.calc_data(th)
+        # return th, self.calc_data(th)
 
     def calc_data(self, points, verbose=1):
         """Calculate spectra (data labels) for given thicknesses (data features)"""
