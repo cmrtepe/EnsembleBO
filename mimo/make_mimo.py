@@ -55,8 +55,8 @@ def train(model, data_loader, optimizer, ens_size):
         loss.backward()
         optimizer.step()
 
-        total_loss += loss
-    return total_loss.item()/len(data_loader)
+        total_loss += loss.item()
+    return total_loss/len(data_loader)
 
 def test(model, data_loader):
     
@@ -76,6 +76,6 @@ def test(model, data_loader):
             pred = model(input)
             loss = loss_fun(pred, target)
 
-            test_loss += loss
+            test_loss += loss.item()
             
-    return test_loss.item()/len(data_loader)
+    return test_loss/len(data_loader)

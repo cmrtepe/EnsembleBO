@@ -56,11 +56,12 @@ def run_mimo(architecture=(32, 128), ens_sizes=(1, 2, 3, 4, 5),
 
                 if epoch % eval_epoch == 0:
                 # Save testing performance.
-                    per_ens_member_ytest_pred = mimo_mlp(torch.tile(Xtest.to(device), (1, ens_size)))
-                    ytest_pred[rep][ens_size][epoch] = per_ens_member_ytest_pred
+                    with torch.no_grad():
+                        per_ens_member_ytest_pred = mimo_mlp(torch.tile(Xtest.to(device), (1, ens_size)))
+                        ytest_pred[rep][ens_size][epoch] = per_ens_member_ytest_pred
 
-                    per_ens_member_ytest_wide_pred = mimo_mlp(torch.tile(Xtest_wide.to(device), (1, ens_size)))
-                    ytest_wide_pred[rep][ens_size][epoch] = per_ens_member_ytest_wide_pred
+                        per_ens_member_ytest_wide_pred = mimo_mlp(torch.tile(Xtest_wide.to(device), (1, ens_size)))
+                        ytest_wide_pred[rep][ens_size][epoch] = per_ens_member_ytest_wide_pred
 
     return Xtest0, ytest, ytest_pred, Xtest0_wide, ytest_wide, ytest_wide_pred
 
