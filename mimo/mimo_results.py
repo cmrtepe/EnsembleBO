@@ -18,16 +18,16 @@ def compute_mean_prediction(y_ens_pred_runs):
 def compute_squared_bias(y_test, y_ens_pred_runs):
   """Compute predictive squared bias over experiment repetitions."""
   y_pred_mean = compute_mean_prediction(y_ens_pred_runs)
-  return torch.mean((y_test - y_pred_mean)**2)
+  return torch.mean((y_test.detach().cpu() - y_pred_mean.detach().cpu())**2)
 
 def compute_variance(y_ens_pred_runs):
   """Compute predictive variance over experiment repetitions."""
-  ens_pred_mean = compute_mean_prediction(y_ens_pred_runs)
+  ens_pred_mean = compute_mean_prediction(y_ens_pred_runs).detach().cpu()
 
   ens_var_list = []
   for y_ens_pred in y_ens_pred_runs.values():
     # Compute variance of ensemble prediction for each repetition
-    ens_pred = compute_ens_mean(y_ens_pred)
+    ens_pred = compute_ens_mean(y_ens_pred).detach().cpu()
     ens_var_list.append((ens_pred_mean - ens_pred)**2)
   return torch.mean(torch.stack(ens_var_list))
 
