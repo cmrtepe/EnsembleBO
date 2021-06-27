@@ -69,6 +69,12 @@ def main(exp_config):
 
     Xtest, ytest, ytest_pred, Xtest_wide, ytest_wide, ytest_wide_pred = run_mimo(**exp_config)
 
+    torch.save(Xtest, "tensors/Xtest.pt")
+    torch.save(ytest, "tensors/ytest.pt")
+    torch.save(ytest_pred, "tensors/ytest_pred.pt")
+    torch.save(Xtest_wide, "tensors/Xtest_wide.pt")
+    torch.save(ytest_wide, "tensors/ytest_wide.pt")
+    torch.save(ytest_wide_pred, "tensors/ytest_wide_pred.pt")
     return Xtest, ytest, ytest_pred, Xtest_wide, ytest_wide, ytest_wide_pred
 
 if __name__ == "__main__":
@@ -82,12 +88,12 @@ if __name__ == "__main__":
     n_epochs=2000, 
     ens_sizes=(1,2,3,4,5)
     parser.add_argument("--data-dim", type=int, default=1)
-    parser.add_argument("--architecture", type=list, default=(32, 128))
+    parser.add_argument("--architecture", type=list, default=(32, 128)) #32 , 128
     parser.add_argument("--n-train", type=int, default=64)
-    parser.add_argument("--n-test", type=int, default=3000)
-    parser.add_argument("--num-reps", type=int, default=20)
+    parser.add_argument("--n-test", type=int, default=3000) # 3000
+    parser.add_argument("--num-reps", type=int, default=20) # 20
     parser.add_argument("--lr", type=float, default=0.01)
-    parser.add_argument("--n-epochs", type=int, default=2000)
+    parser.add_argument("--n-epochs", type=int, default=2000) # 2000
     parser.add_argument("--ens-sizes", type=list, default=(1,2,3,4,5))
 
     args = parser.parse_args()
