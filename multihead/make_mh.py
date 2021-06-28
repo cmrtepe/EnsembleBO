@@ -27,6 +27,14 @@ class MultiHead(nn.Module):
 
         return torch.stack([model(input) for model in self.models], dim=-1)
 
+    def reset_weights(self):
+        def weights_init(m):
+            if isinstance(m, nn.Conv2d):
+                torch.nn.init.normal_(m.weight.data)
+        for model in self.models:
+            model.apply(weights_init)
+    
+
     def creat_model(self, arch, in_size, out_size):
         
         layers = []

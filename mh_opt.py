@@ -6,6 +6,7 @@ from bagging.get_data import get_problem, get_obj
 import torch
 from torch.utils import data
 import numpy as np
+from torch import cuda
 device = "cuda" if cuda.is_available() else "cpu"
 
 def main(n_batch, n_epochs, batch_size=8, n_train=200, acquisition="ei", objective="orange",
@@ -24,7 +25,7 @@ def main(n_batch, n_epochs, batch_size=8, n_train=200, acquisition="ei", objecti
         z_train = prob_fun(x_train)
         y_train = obj_fun(z_train)
 
-        x_train = torch.from_numpy(x_train).to(device).float().
+        x_train = torch.from_numpy(x_train).to(device).float()
         z_train = torch.from_numpy(z_train).to(device).float().squeeze()
 
         multihead = make_mh.MultiHead(ens_size=ens_size, n_units=256, n_layers=8, in_dim=6, out_dim=201).to(device)
@@ -41,6 +42,7 @@ def main(n_batch, n_epochs, batch_size=8, n_train=200, acquisition="ei", objecti
 
         for i in range(n_train):
 
+            multihead.reset_weights()
             _ = multihead.train(n_epochs, batch_size, x_train, z_train)
 
             # new sample
@@ -66,6 +68,7 @@ def main(n_batch, n_epochs, batch_size=8, n_train=200, acquisition="ei", objecti
         
         print(x_best)
         print(np.max(y_best_list))
+
 
 
 if __name__ == "__main__":
