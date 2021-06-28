@@ -67,10 +67,11 @@ def main(n_batch, n_epochs, batch_size=8, n_train=200, acquisition="ei", objecti
             n_data_list.append(x_train.size(0))
             y_best_list.append(y_best)
             print("Trained with %d data points. Best value=%f" % (x_train.size(0), y_best))
+            
         
-        with open("n_data_list.txt", "a+") as fb:
+        with open("n_data_list.txt", "ab+") as fb:
             pickle.dump(n_data_list, fb)
-        with open("y_best_list.txt", "a+") as fb:
+        with open("y_best_list.txt", "ab+") as fb:
             pickle.dump(y_best_list, fb)
         print(x_best)
         print(np.max(y_best_list))
