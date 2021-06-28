@@ -9,10 +9,9 @@ from torch import cuda
 
 device = "cuda" if cuda.is_available() else "cpu"
 
-def create_mimo(architecture, data_dim=1, ens_size=1):
+def create_mimo(architecture, data_dim=1, ens_size=1, num_logits=1):
     """Create a MIMO model by expanding input/ouput layer by ensemble size."""
     # The only modification needed by MIMO: expand input/output layer by ensemble size
-    num_logits = 1  # Since this is a regression problem.
     inputs_size = data_dim * ens_size
     outputs_size = num_logits * ens_size
     
@@ -46,7 +45,7 @@ def train(model, data_loader, optimizer, ens_size):
             inputs.append(shuffled_in)
             targets.append(shuffled_trg)
         inputs = torch.cat(inputs, dim=1)
-        targets = torch.cat(targets, dim=1).squeeze(-1)
+        targets = torch.cat(targets, dim=1).flatten(start_dim=1)
         optimizer.zero_grad()
 
         loss_fun = nn.MSELoss()
@@ -79,3 +78,7 @@ def test(model, data_loader):
             test_loss += loss.item()
             
     return test_loss/len(data_loader)
+
+def predict_posterior(model, data_dim, ens_size, input):
+
+    return model(input).view(-1, 201, ens_size)
