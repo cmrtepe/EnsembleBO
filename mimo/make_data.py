@@ -18,6 +18,9 @@ class SimpleDataset(data.Dataset):
         return self.x.shape[0]
     def __getitem__(self, idx):
         return self.x[[idx],:], self.y[[idx], :]
+    def add(self, x_pt, y_pt):
+        self.x = torch.cat([self.x, x_pt], dim=0)
+        self.y = torch.cat([self.y, y_pt], dim=0)
 
 def create_data(n, data_dim=1, data_noise=0.02, batch_size=8, support=(-1., 1.)):
   

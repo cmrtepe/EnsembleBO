@@ -79,14 +79,6 @@ def main(exp_config):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Ensemble training")
-    data_dim=1, 
-    architecture=(32, 128),
-    n_train=64, 
-    n_test=3000, 
-    num_reps=20,
-    lr=0.01,
-    n_epochs=2000, 
-    ens_sizes=(1,2,3,4,5)
     parser.add_argument("--data-dim", type=int, default=1)
     parser.add_argument("--architecture", type=list, default=(32, 128)) #32 , 128
     parser.add_argument("--n-train", type=int, default=64)
