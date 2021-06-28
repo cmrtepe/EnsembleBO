@@ -9,6 +9,8 @@ import numpy as np
 from torch import cuda
 device = "cuda" if cuda.is_available() else "cpu"
 
+import pickle
+
 def main(n_batch, n_epochs, batch_size=8, n_train=200, acquisition="ei", objective="orange",
         x_dim=6, trials=1, architecture=(32,128,256,128), ens_size=10, n_start=5):
 
@@ -66,6 +68,10 @@ def main(n_batch, n_epochs, batch_size=8, n_train=200, acquisition="ei", objecti
             y_best_list.append(y_best)
             print("Trained with %d data points. Best value=%f" % (x_train.size(0), y_best))
         
+        with open("n_data_list.txt", "a+") as fb:
+            pickle.dump(n_data_list, fb)
+        with open("y_best_list.txt", "a+") as fb:
+            pickle.dump(y_best_list, fb)
         print(x_best)
         print(np.max(y_best_list))
 
