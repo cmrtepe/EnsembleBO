@@ -52,16 +52,17 @@ class MultiHead(nn.Module):
 
         return nn.Sequential(*layers)
     
-    def train(self, n_epochs, batch_size, input, target, opt="adam", lr=0.01):
+    def train(self, n_epochs, batch_size, input, target, opts, scheds, lr=0.01):
 
         tdataset = SimpleDataset(input, target)
         tloader = data.DataLoader(tdataset, batch_size, shuffle=True)
         
         losses = []
 
-        for model in self.models:
-            if opt=="adam":
-                optimizer = optim.Adam(model.parameters(), lr=lr)
+        for i in range(len(self.models)):
+            model = self.models[i]
+            optimizer = opts[i]
+            scheduler = scheds[i]
             for epoch in range(n_epochs):
                 model.train()
 
@@ -81,6 +82,7 @@ class MultiHead(nn.Module):
                     total_loss += loss.item()
                     
                     losses.append(total_loss/len(tloader))
+                scheduler.step()
         return losses
 
 class SimpleDataset(data.Dataset):
