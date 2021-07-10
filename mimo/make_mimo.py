@@ -23,8 +23,15 @@ def create_mimo(architecture, data_dim=1, ens_size=1, num_logits=1):
         layers.append(nn.ReLU())
         prev = units
     layers.append(nn.Linear(prev, outputs_size))
+    mm = nn.Sequential(*layers)
+    reset_weights(mm)
+    return mm
 
-    return nn.Sequential(*layers)
+def reset_weights(model):
+        def weights_init(m):
+            if isinstance(m, nn.Conv2d):
+                torch.nn.init.normal_(m.weight.data)
+        model.apply(weights_init)
 
 def train(model, data_loader, optimizer, ens_size):
 
@@ -69,8 +76,6 @@ def test(model, data_loader):
             input = input.to(device).float()
             target = target.to(device).float()
 
-            output = model(input)
-
             loss_fun = nn.MSELoss()
             pred = model(input)
             loss = loss_fun(pred, target)
@@ -81,4 +86,4 @@ def test(model, data_loader):
 
 def predict_posterior(model, data_dim, ens_size, input):
 
-    return model(input).view(-1, 201, ens_size)
+    return model(input.to(device)).view(-1, 201, ens_size)

@@ -6,9 +6,13 @@ from bagging.get_data import get_problem, get_obj
 import torch
 from torch.utils import data
 import numpy as np
+import pickle
+from torch import cuda
+
+device = "cuda" if cuda.is_available() else "cpu"
 
 def main(n_batch, n_epochs, batch_size=8, n_train=200, acquisition="ei", objective="orange",
-        x_dim=6, trials=1, architecture=(32,128,256,128), ens_size=10, n_start=5):
+        x_dim=6, trials=1, architecture=[512]*8, ens_size=50, n_start=5):
 
     params = calc_spectrum.MieScattering(n_layers=x_dim)
 
@@ -27,9 +31,9 @@ def main(n_batch, n_epochs, batch_size=8, n_train=200, acquisition="ei", objecti
         z_train = torch.from_numpy(z_train).squeeze()
 
         training_dataset = make_data.SimpleDataset(x_train, z_train)
-        training_dlr = data.DataLoader(training_dataset, batch_size, shuffle=True)
+        
 
-        mimo_mlp = make_mimo.create_mimo(architecture, data_dim=x_dim, ens_size=ens_size, num_logits=z_train.size(-1))
+        mimo_mlp = make_mimo.create_mimo(architecture, data_dim=x_dim, ens_size=ens_size, num_logits=z_train.size(-1)).to(device)
 
         def f(samples):
             samples = torch.from_numpy(samples)
@@ -47,12 +51,18 @@ def main(n_batch, n_epochs, batch_size=8, n_train=200, acquisition="ei", objecti
 
         n_data_list, y_best_list = [], []
 
+        optimizer = torch.optim.Adam(mimo_mlp.parameters(), lr=0.005)
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, 150)
         for i in range(n_train):
-
-            optimizer = torch.optim.Adam(mimo_mlp.parameters(), lr=0.01, weight_decay=1e-5)
-            for epoch in range(n_epochs):
-                _ = make_mimo.train(mimo_mlp, training_dlr, optimizer, ens_size)
-
+            training_dlr = data.DataLoader(training_dataset, batch_size, shuffle=True)
+            if i == 0:
+                for _ in range(200):
+                    _ = make_mimo.train(mimo_mlp, training_dlr, optimizer, ens_size)
+            
+            else:
+                for epoch in range(n_epochs):
+                    _ = make_mimo.train(mimo_mlp, training_dlr, optimizer, ens_size)
+            scheduler.step()
             # new sample
             x_sample = params.sample_x(int(1e4))
             _, x_new = bo.ei_mc(x_sample, f, y_best, obj_fun)
@@ -67,7 +77,6 @@ def main(n_batch, n_epochs, batch_size=8, n_train=200, acquisition="ei", objecti
             x_train = torch.vstack([x_train, x_new])
             z_train = torch.vstack([z_train, z_new])
             training_dataset = make_data.SimpleDataset(x_train, z_train)
-            training_dlr = data.DataLoader(training_dataset, batch_size, shuffle=True)
             
             i_best = np.argmax(obj_fun(z_train.detach().cpu().numpy())) # new best idx
             y_best = obj_fun(z_train.detach().cpu().numpy())[i_best]
@@ -76,13 +85,18 @@ def main(n_batch, n_epochs, batch_size=8, n_train=200, acquisition="ei", objecti
             y_best_list.append(y_best)
             print("Trained with %d data points. Best value=%f" % (len(training_dataset), y_best))
         
+        with open("n_listmimo.txt", "wb+") as fp:
+            pickle.dump(n_data_list, fp)
+        with open("y_listmimo.txt", "wb+") as fp:
+            pickle.dump(y_best_list, fp)
+
         print(x_best)
         print(np.max(y_best_list))
 
 
 if __name__ == "__main__":
 
-    main(8, 100)
+    main(8, 10)
 
 
 

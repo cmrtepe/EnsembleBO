@@ -68,16 +68,16 @@ def run_mimo(architecture=(32, 128), ens_sizes=(1, 2, 3, 4, 5),
 def main(exp_config):
 
     Xtest, ytest, ytest_pred, Xtest_wide, ytest_wide, ytest_wide_pred = run_mimo(**exp_config)
-
+    # Save the tensors for further analysis
     torch.save(Xtest, "tensors/Xtest.pt")
     torch.save(ytest, "tensors/ytest.pt")
     torch.save(ytest_pred, "tensors/ytest_pred.pt")
     torch.save(Xtest_wide, "tensors/Xtest_wide.pt")
     torch.save(ytest_wide, "tensors/ytest_wide.pt")
     torch.save(ytest_wide_pred, "tensors/ytest_wide_pred.pt")
-    return Xtest, ytest, ytest_pred, Xtest_wide, ytest_wide, ytest_wide_pred
 
 if __name__ == "__main__":
+    # Arguments for training
     parser = argparse.ArgumentParser(description="Ensemble training")
     parser.add_argument("--data-dim", type=int, default=1)
     parser.add_argument("--architecture", type=list, default=(32, 128)) #32 , 128
